@@ -204,17 +204,19 @@ Now that you've assessed the application, let's begin the database migration fro
 
 ### Step 3: Deploy to Azure
 
-At this point, you have successfully migrated the application to PostgreSQL. Now, you can deploy it to Azure.
+At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure.
 
 1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Provision Infrastructure and Deploy to Azure**.
 
     ![Run Deployment task](doc-media/deployment-run-task.png)
-1. A predefined prompt will be populated in the Copilot Chat panel with Agent Mode.
+1. The Copilot Chat panel opens in Agent Mode and will be populated with a predefined prompt.
 
-1. Click ****Continue**/**Allow** if pop-up notifications to let Copilot Agent analyze the project and create a deployment plan in **plan.copilotmd** with Azure resources architecture, recommended Azure resources for project and security configurations, and execution steps for deployment.
+    ![Deployment Prompt](doc-media/deployment-task-prompt.png)
+1. Select `Azure Container Apps` in pop-up question box. Provide information as requested. Click **Continue**/**Allow** in pop-up notifications to let Copilot Agent analyze the project and create a deployment plan in **plan.copilotmd** with Azure resources architecture, recommended Azure resources for project and security configurations, and execution steps for deployment.
 
-1. View the architecture diagram, resource configurations, and execution steps in the plan. Click **Keep** to save the plan and type in **Execute the plan** to start the deployment.
+    ![Deployment questions](doc-media/deployment-target-question.png)
+1. View the architecture diagram, resource configurations, and execution steps in the plan. Copilot will automatically execute the deployment steps.
 
-1. When prompted, click **Continue**/**Allow** in chat notifications or type **y**/**yes** in terminal as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**. **DO NOT interrupt** when provisioning or deployment scripts are running.
+1. When prompted, click **Continue**/**Allow** in chat notifications as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**.
 
     ![Deployment progress](doc-media/deployment-progress.png)
