@@ -206,6 +206,10 @@ Now that you've assessed the application, let's begin the database migration fro
 
 At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure.
 
+#### 3.1 Provision New Infrastructure and Deploy
+
+Follow this section when you don't have any prepared Azure resources and let the Copilot Agent help provision the necessary infrastructure and deploy the application.
+
 1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Provision Infrastructure and Deploy to Azure**.
 
     ![Run Deployment task](doc-media/deployment-run-task.png)
@@ -220,3 +224,21 @@ At this point, you have successfully migrated the database to PostgreSQL. Now, y
 1. When prompted, click **Continue**/**Allow** in chat notifications as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**.
 
     ![Deployment progress](doc-media/deployment-progress.png)
+
+### 3.2 Deploy to Existing Azure Resources
+
+Follow this section if you already have the necessary Azure resources provisioned and just want to deploy the application to those existing resources.
+
+1. Check if you have the necessary Azure resources in a resource group for this project. It is better to have the connections between resources already set up, for example, the Container App should have the connection settings to the PostgreSQL database configured. The necessary Azure resources include but are not limited to:
+    - Azure Container Apps
+    - Azure Database for PostgreSQL Flexible Server
+    - Azure Container Registry
+    - Azure Key Vault
+
+1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Deploy to Existing Azure Infrastructure**.
+
+    ![Run Deployment to existing task](doc-media/deploy-to-existing-task.png)
+1. The Copilot Chat panel opens in Agent Mode and will be populated with a predefined prompt.
+
+    ![Deployment to existing prompt](doc-media/deploy-to-existing-prompt.png)
+1. Provide the necessary information such as Azure subscription, resource group in pop-up notifications. Click **Continue**/**Allow** to let Copilot Agent analyze the project and create a deployment plan in **plan.copilotmd** with execution steps for deployment. Check the deployment progress in **progress.copilotmd**.
