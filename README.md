@@ -229,11 +229,12 @@ Follow this section when you don't have any prepared Azure resources and let the
 
 Follow this section if you already have the necessary Azure resources provisioned and just want to deploy the application to those existing resources.
 
-1. Check if you have the necessary Azure resources in a resource group for this project. It is better to have the connections between resources already set up, for example, the Container App should have the connection settings to the PostgreSQL database configured. The necessary Azure resources include but are not limited to:
-    - Azure Container Apps
-    - Azure Database for PostgreSQL Flexible Server
+1. Check if you have the necessary Azure resources in a resource group for this project:
+    - Azure Container Apps (with Azure Container Apps Environment and Azure Log Analytics Workspace as dependency)
+    - Azure Database for PostgreSQL Flexible Server with a database created
     - Azure Container Registry
-    - Azure Key Vault
+    - Azure Key Vault (to securely store database credentials and other secrets)
+    - Azure User Assigned Managed Identity (for secure access to ACR and Key Vault)
 
 1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Deploy to Existing Azure Infrastructure**.
 
@@ -242,3 +243,5 @@ Follow this section if you already have the necessary Azure resources provisione
 
     ![Deployment to existing prompt](doc-media/deploy-to-existing-prompt.png)
 1. Provide the necessary information such as Azure subscription, resource group in pop-up notifications. Click **Continue**/**Allow** to let Copilot Agent analyze the project and create a deployment plan in **plan.copilotmd** with execution steps for deployment. Check the deployment progress in **progress.copilotmd**.
+
+    ![Deployment to existing execution](doc-media/deploy-to-existing-execution-steps.png)
