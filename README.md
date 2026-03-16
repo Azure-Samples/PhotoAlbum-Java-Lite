@@ -231,3 +231,13 @@ Now that you've assessed the application, let's begin the database migration fro
 1. When prompted, click **Continue**/**Allow** in chat notifications as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**.
 
     ![Deployment progress](doc-media/deployment-progress.png)
+
+### Step 4: Clean Up Azure Resources
+1. Find the resource group name used for deployment in the `plan.copilotmd`, `progress.copilotmd`, or `summary.copilotmd` file.
+
+1. Navigate to the resource group in the [Azure Portal](https://portal.azure.com/), review the resources, and delete the resource group to clean up all resources created during the deployment. You can also use Azure CLI to list the resources and delete the resource group:
+
+    ```bash
+    az resource list --resource-group <your-resource-group-name>
+    az group delete --name <your-resource-group-name> --yes --no-wait
+    ```
