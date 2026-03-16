@@ -122,6 +122,13 @@ Before starting this workshop, ensure you have:
 - In the Visual Studio Code settings, make sure this setting is enabled (it might be controlled by your organization)
 - Access to public Maven Central repository for Maven-based projects
 - Git-managed Java project using Maven
+- Ensure the following tools are selected:
+  - Built-in
+  - GitHub Copilot app modernization Deploy
+  - GitHub Copilot app modernization
+  - GitHub Copilot modernization - upgrade for Java
+
+  ![Tools Selection](doc-media/tool-selection.png)
 
 ## Workshop Steps
 
@@ -204,10 +211,6 @@ Now that you've assessed the application, let's begin the database migration fro
 
 ### Step 3: Deploy to Azure
 
-At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure. Ensure that the **Github Copilot app modernization Deploy** tools are selected in the Copilot Chat settings before proceeding.
-
-    
-![Deploy tools selected](doc-media/deploy-tools-selected.png)
 1. Login to Azure account and select the subscription you want to use for deployment:
 
     ```bash
