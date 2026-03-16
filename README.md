@@ -206,6 +206,12 @@ Now that you've assessed the application, let's begin the database migration fro
 
 At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure.
 
+1. Login to Azure account and select the subscription you want to use for deployment:
+
+    ```bash
+    az login
+    az account set --subscription "<your-subscription-id>"
+    ```
 1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Provision Infrastructure and Deploy to Azure**.
 
     ![Run Deployment task](doc-media/deployment-run-task.png)
