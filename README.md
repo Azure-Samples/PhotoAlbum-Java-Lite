@@ -8,8 +8,8 @@ The migration will transform your application from using Oracle Database to a mo
 ## Table of Contents
 
 - [Overview](#overview)
-- [Running Locally (Pre-Migration)](#running-locally-pre-migration)
 - [Prerequisites](#prerequisites)
+- [Running Locally (Optional, Pre-Migration)](#running-locally-optional-pre-migration)
 - [Workshop Steps](#workshop-steps)
   - [Step 1: Assess Your Java Application](#step-1-assess-your-java-application)
   - [Step 2: Migrate from Oracle to PostgreSQL](#step-2-migrate-from-oracle-to-postgresql)
@@ -41,11 +41,62 @@ The complete workshop takes approximately **40 minutes** to complete. Here's the
 - **Migrate from Oracle to PostgreSQL**: ~15 minutes
 - **Deploy to Azure**: ~20 minutes
 
-## Running Locally (Pre-Migration)
+## Prerequisites
 
-Before starting the migration, you can run the original Oracle-based application locally to understand how it works.
+Before starting this workshop, ensure you have:
 
-### Quick Start with Docker Compose
+### Required Software
+
+- **Operating System**: Windows, macOS, or Linux
+- **Java Development Kit (JDK)**: JDK 21 or higher
+  - Download from [Microsoft OpenJDK](https://learn.microsoft.com/java/openjdk/download)
+- **Maven**: 3.8.0 or higher
+  - Download from [Apache Maven](https://maven.apache.org/download.cgi)
+- **Docker Desktop**: Latest version, required only if you want to run this project locally
+  - Download from [Docker](https://docs.docker.com/desktop/)
+- **Git**: For version control
+  - Download from [Git](https://git-scm.com/)
+
+### IDE and Extensions
+
+- **Visual Studio Code**: Version 1.101 or later
+  - Download from [Visual Studio Code](https://code.visualstudio.com/)
+- **GitHub Copilot**: Must be enabled in your GitHub account
+  - [GitHub Copilot subscription](https://github.com/features/copilot) (Pro, Pro+, Business, or Enterprise)
+- **VS Code Extensions** (Required):
+  1. **GitHub Copilot** extension
+     - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
+     - Sign in to your GitHub account within VS Code
+  2. **GitHub Copilot app modernization** extension
+     - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vscjava.migrate-java-to-azure)
+     - Restart VS Code after installation
+  3. **Bicep** extension
+     - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep)
+
+### Azure Requirements
+
+- **Azure Account**: Active Azure subscription
+  - [Create a free account](https://azure.microsoft.com/free/) if you don't have one
+- **Azure CLI**: Latest version
+  - Download from [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
+
+### Configuration
+
+- Ensure `chat.extensionTools.enabled` is set to `true` in VS Code settings
+- In the Visual Studio Code settings, make sure this setting is enabled (it might be controlled by your organization)
+- Access to public Maven Central repository for Maven-based projects
+- Git-managed Java project using Maven
+- Ensure the following tools are selected:
+  - Built-in
+  - GitHub Copilot app modernization Deploy
+  - GitHub Copilot app modernization
+  - GitHub Copilot modernization - upgrade for Java
+
+  ![Tools Selection](doc-media/tool-selection.png)
+
+## Running Locally (Optional, Pre-Migration)
+
+This section is optional. Before starting the migration, you can run the original Oracle-based application locally to understand how it works.
 
 1. **Clone the repository** (if not already done):
    ```bash
@@ -78,57 +129,6 @@ Before starting the migration, you can run the original Oracle-based application
    ```bash
    docker-compose down -v
    ```
-
-## Prerequisites
-
-Before starting this workshop, ensure you have:
-
-### Required Software
-
-- **Operating System**: Windows, macOS, or Linux
-- **Java Development Kit (JDK)**: JDK 21 or higher
-  - Download from [Microsoft OpenJDK](https://learn.microsoft.com/java/openjdk/download)
-- **Maven**: 3.8.0 or higher
-  - Download from [Apache Maven](https://maven.apache.org/download.cgi)
-- **Docker Desktop**: Latest version, required if you want to run locally
-  - Download from [Docker](https://docs.docker.com/desktop/)
-- **Git**: For version control
-  - Download from [Git](https://git-scm.com/)
-
-### IDE and Extensions
-
-- **Visual Studio Code**: Version 1.101 or later
-  - Download from [Visual Studio Code](https://code.visualstudio.com/)
-- **GitHub Copilot**: Must be enabled in your GitHub account
-  - [GitHub Copilot subscription](https://github.com/features/copilot) (Pro, Pro+, Business, or Enterprise)
-- **VS Code Extensions** (Required):
-  1. **GitHub Copilot** extension
-     - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
-     - Sign in to your GitHub account within VS Code
-  2. **GitHub Copilot app modernization** extension
-     - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vscjava.migrate-java-to-azure)
-     - Restart VS Code after installation
-
-### Azure Requirements
-
-- **Azure Account**: Active Azure subscription
-  - [Create a free account](https://azure.microsoft.com/free/) if you don't have one
-- **Azure CLI**: Latest version
-  - Download from [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
-
-### Configuration
-
-- Ensure `chat.extensionTools.enabled` is set to `true` in VS Code settings
-- In the Visual Studio Code settings, make sure this setting is enabled (it might be controlled by your organization)
-- Access to public Maven Central repository for Maven-based projects
-- Git-managed Java project using Maven
-- Ensure the following tools are selected:
-  - Built-in
-  - GitHub Copilot app modernization Deploy
-  - GitHub Copilot app modernization
-  - GitHub Copilot modernization - upgrade for Java
-
-  ![Tools Selection](doc-media/tool-selection.png)
 
 ## Workshop Steps
 
