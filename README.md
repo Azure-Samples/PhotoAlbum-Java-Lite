@@ -228,6 +228,8 @@ Now that you've assessed the application, let's begin the database migration fro
     ![Deployment questions](doc-media/deployment-target-question.png)
 1. View the architecture diagram, resource configurations, and execution steps in the plan. Copilot will automatically execute the deployment steps.
 
+    To customize deployment settings such as the Azure region or resource group name, click **Cancel** when the agent is ready to proceed and provide a more specific follow-up prompt. For example: `I want to deploy in <region>.` or `The resource group name should be <resource-group-name>.`
+
 1. When prompted, click **Continue**/**Allow** in chat notifications as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**.
 
     ![Deployment progress](doc-media/deployment-progress.png)
