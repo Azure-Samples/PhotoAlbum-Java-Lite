@@ -14,6 +14,7 @@ The migration will transform your application from using Oracle Database to a mo
   - [Step 1: Assess Your Java Application](#step-1-assess-your-java-application)
   - [Step 2: Migrate from Oracle to PostgreSQL](#step-2-migrate-from-oracle-to-postgresql)
   - [Step 3: Deploy to Azure](#step-3-deploy-to-azure)
+  - [Step 4: Clean Up Azure Resources](#step-4-clean-up-azure-resources)
 
 ## Overview
 
