@@ -19,7 +19,7 @@ public interface PhotoRepository extends JpaRepository<Photo, String> {
      * Find all photos ordered by upload date (newest first)
      * @return List of photos ordered by upload date descending
      */
-    @Query(value = "SELECT id, original_file_name, photo_data, file_size, " +
+    @Query(value = "SELECT id, original_file_name, blob_url, file_size, " +
                    "mime_type, uploaded_at, width, height " +
                    "FROM photos " +
                    "ORDER BY uploaded_at DESC", 
@@ -32,7 +32,7 @@ public interface PhotoRepository extends JpaRepository<Photo, String> {
      * @return List of photos uploaded before the given timestamp
      */
     @Query(value = "SELECT * FROM (" +
-                   "SELECT id, original_file_name, photo_data, file_size, " +
+                   "SELECT id, original_file_name, blob_url, file_size, " +
                    "mime_type, uploaded_at, width, height, ROWNUM as rn " +
                    "FROM photos " +
                    "WHERE uploaded_at < :uploadedAt " +
@@ -46,7 +46,7 @@ public interface PhotoRepository extends JpaRepository<Photo, String> {
      * @param uploadedAt The upload timestamp to compare against
      * @return List of photos uploaded after the given timestamp
      */
-    @Query(value = "SELECT id, original_file_name, photo_data, file_size, " +
+    @Query(value = "SELECT id, original_file_name, blob_url, file_size, " +
                    "mime_type, uploaded_at, width, height " +
                    "FROM photos " +
                    "WHERE uploaded_at > :uploadedAt " +

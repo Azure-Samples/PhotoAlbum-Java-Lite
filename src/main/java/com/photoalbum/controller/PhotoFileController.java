@@ -4,20 +4,18 @@ import com.photoalbum.model.Photo;
 import com.photoalbum.service.PhotoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.net.URI;
 import java.util.Optional;
 
 /**
- * Controller for serving photo files from database storage
+ * Controller for serving photo files — redirects to Azure Blob Storage URL
  */
 @Controller
 @RequestMapping("/photo")
@@ -32,17 +30,16 @@ public class PhotoFileController {
     }
 
     /**
-     * Serves a photo file by ID from database storage
+     * Serves a photo by redirecting to its Azure Blob Storage URL
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> servePhoto(@PathVariable String id) {
+    public ResponseEntity<Void> servePhoto(@PathVariable String id) {
         if (id == null || id.trim().isEmpty()) {
             logger.warn("Photo file request with null or empty ID");
             return ResponseEntity.notFound().build();
         }
 
         try {
-            logger.info("=== DEBUGGING: Serving photo request for ID {} ===", id);
             Optional<Photo> photoOpt = photoService.getPhotoById(id);
 
             if (photoOpt.isEmpty()) {
@@ -51,39 +48,20 @@ public class PhotoFileController {
             }
 
             Photo photo = photoOpt.get();
-            logger.info("Found photo: originalFileName={}, mimeType={}", 
-                    photo.getOriginalFileName(), photo.getMimeType());
+            String blobUrl = photo.getBlobUrl();
 
-            // Get photo data from database
-            byte[] photoData = photo.getPhotoData();
-            if (photoData == null || photoData.length == 0) {
-                logger.error("No photo data found for photo ID {}", id);
+            if (blobUrl == null || blobUrl.isBlank()) {
+                logger.error("No blob URL found for photo ID {}", id);
                 return ResponseEntity.notFound().build();
             }
 
-            logger.info("Photo data retrieved: {} bytes, first 10 bytes: {}", 
-                    photoData.length, 
-                    photoData.length >= 10 ? java.util.Arrays.toString(java.util.Arrays.copyOf(photoData, 10)) : "less than 10 bytes");
-
-            // Create resource from byte array
-            Resource resource = new ByteArrayResource(photoData);
-
-            logger.info("Serving photo ID {} ({}, {} bytes) from database",
-                    id, photo.getOriginalFileName(), photoData.length);
-
-            // Return the photo data with appropriate content type and aggressive no-cache headers
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(photo.getMimeType()))
-                    .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate, private")
-                    .header(HttpHeaders.PRAGMA, "no-cache")
-                    .header(HttpHeaders.EXPIRES, "0")
-                    .header("X-Photo-ID", String.valueOf(id))
-                    .header("X-Photo-Name", photo.getOriginalFileName())
-                    .header("X-Photo-Size", String.valueOf(photoData.length))
-                    .body(resource);
+            logger.info("Redirecting photo ID {} ({}) to blob URL", id, photo.getOriginalFileName());
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(blobUrl))
+                    .build();
         } catch (Exception ex) {
-            logger.error("Error serving photo with ID {} from database", id, ex);
-            return ResponseEntity.status(500).build();
+            logger.error("Error serving photo with ID {}", id, ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

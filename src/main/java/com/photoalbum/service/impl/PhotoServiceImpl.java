@@ -1,5 +1,8 @@
 package com.photoalbum.service.impl;
 
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.photoalbum.model.Photo;
 import com.photoalbum.model.UploadResult;
 import com.photoalbum.repository.PhotoRepository;
@@ -29,14 +32,17 @@ public class PhotoServiceImpl implements PhotoService {
     private static final Logger logger = LoggerFactory.getLogger(PhotoServiceImpl.class);
 
     private final PhotoRepository photoRepository;
+    private final BlobContainerClient blobContainerClient;
     private final long maxFileSizeBytes;
     private final List<String> allowedMimeTypes;
 
     public PhotoServiceImpl(
             PhotoRepository photoRepository,
+            BlobContainerClient blobContainerClient,
             @Value("${app.file-upload.max-file-size-bytes}") long maxFileSizeBytes,
             @Value("${app.file-upload.allowed-mime-types}") String[] allowedMimeTypes) {
         this.photoRepository = photoRepository;
+        this.blobContainerClient = blobContainerClient;
         this.maxFileSizeBytes = maxFileSizeBytes;
         this.allowedMimeTypes = Arrays.asList(allowedMimeTypes);
     }
@@ -70,7 +76,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * Upload a photo file
+     * Upload a photo file — stores binary in Azure Blob Storage and saves the blob URL in the database
      */
     @Override
     public UploadResult uploadPhoto(MultipartFile file) {
@@ -82,7 +88,7 @@ public class PhotoServiceImpl implements PhotoService {
             if (!allowedMimeTypes.contains(file.getContentType().toLowerCase())) {
                 result.setSuccess(false);
                 result.setErrorMessage("File type not supported. Please upload JPEG, PNG, GIF, or WebP images.");
-                logger.warn("Upload rejected: Invalid file type {} for {}", 
+                logger.warn("Upload rejected: Invalid file type {} for {}",
                     file.getContentType(), file.getOriginalFilename());
                 return result;
             }
@@ -91,29 +97,26 @@ public class PhotoServiceImpl implements PhotoService {
             if (file.getSize() > maxFileSizeBytes) {
                 result.setSuccess(false);
                 result.setErrorMessage("File size exceeds %dMB limit.".formatted(maxFileSizeBytes / 1024 / 1024));
-                logger.warn("Upload rejected: File size {} exceeds limit for {}", 
+                logger.warn("Upload rejected: File size {} exceeds limit for {}",
                     file.getSize(), file.getOriginalFilename());
                 return result;
             }
 
-            // Validate file length
+            // Validate file not empty
             if (file.getSize() <= 0) {
                 result.setSuccess(false);
                 result.setErrorMessage("File is empty.");
                 return result;
             }
 
-            // Extract image dimensions and read file data
+            // Read bytes and extract image dimensions
+            byte[] photoBytes;
             Integer width = null;
             Integer height = null;
-            byte[] photoData = null;
-            
+
             try {
-                // Read file content for database storage
-                photoData = file.getBytes();
-                
-                // Extract image dimensions from byte array
-                try (ByteArrayInputStream bis = new ByteArrayInputStream(photoData)) {
+                photoBytes = file.getBytes();
+                try (ByteArrayInputStream bis = new ByteArrayInputStream(photoBytes)) {
                     BufferedImage image = ImageIO.read(bis);
                     if (image != null) {
                         width = image.getWidth();
@@ -127,30 +130,41 @@ public class PhotoServiceImpl implements PhotoService {
                 return result;
             } catch (Exception ex) {
                 logger.warn("Could not extract image dimensions for {}", file.getOriginalFilename(), ex);
-                // Continue without dimensions - not critical
+                photoBytes = file.getBytes();
             }
 
-            // Create photo entity with database storage
-            Photo photo = new Photo(
-                file.getOriginalFilename(),
-                photoData,
-                file.getSize(),
-                file.getContentType()
-            );
+            // Upload to Azure Blob Storage
+            String blobName = java.util.UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String blobUrl;
+            try {
+                BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+                BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(file.getContentType());
+                try (ByteArrayInputStream bis = new ByteArrayInputStream(photoBytes)) {
+                    blobClient.upload(bis, photoBytes.length, true);
+                }
+                blobClient.setHttpHeaders(headers);
+                blobUrl = blobClient.getBlobUrl();
+                logger.info("Uploaded photo {} to Azure Blob Storage: {}", file.getOriginalFilename(), blobUrl);
+            } catch (Exception ex) {
+                logger.error("Error uploading photo {} to Azure Blob Storage", file.getOriginalFilename(), ex);
+                result.setSuccess(false);
+                result.setErrorMessage("Error uploading photo to storage. Please try again.");
+                return result;
+            }
+
+            // Save metadata and blob URL to database
+            Photo photo = new Photo(file.getOriginalFilename(), blobUrl, file.getSize(), file.getContentType());
             photo.setWidth(width);
             photo.setHeight(height);
 
-            // Save to database (with photo data)
             try {
                 photo = photoRepository.save(photo);
-
                 result.setSuccess(true);
                 result.setPhotoId(photo.getId());
-
-                logger.info("Successfully uploaded photo {} with ID {} to database", 
+                logger.info("Successfully uploaded photo {} with ID {} — blob URL saved to database",
                     file.getOriginalFilename(), photo.getId());
             } catch (Exception ex) {
-                logger.error("Error saving photo to database for {}", file.getOriginalFilename(), ex);
+                logger.error("Error saving photo metadata to database for {}", file.getOriginalFilename(), ex);
                 result.setSuccess(false);
                 result.setErrorMessage("Error saving photo to database. Please try again.");
             }
@@ -164,7 +178,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * Delete a photo by ID
+     * Delete a photo — removes blob from Azure Blob Storage and metadata from the database
      */
     @Override
     public boolean deletePhoto(String id) {
@@ -177,10 +191,21 @@ public class PhotoServiceImpl implements PhotoService {
 
             Photo photo = photoOpt.get();
 
-            // Delete from database
-            photoRepository.delete(photo);
+            // Delete blob from Azure Blob Storage
+            if (photo.getBlobUrl() != null && !photo.getBlobUrl().isBlank()) {
+                try {
+                    String blobName = extractBlobName(photo.getBlobUrl());
+                    BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+                    blobClient.deleteIfExists();
+                    logger.info("Deleted blob {} from Azure Blob Storage", blobName);
+                } catch (Exception ex) {
+                    logger.warn("Could not delete blob for photo ID {} — proceeding with database deletion", id, ex);
+                }
+            }
 
-            logger.info("Successfully deleted photo ID {} from Oracle database", id);
+            // Delete metadata from database
+            photoRepository.delete(photo);
+            logger.info("Successfully deleted photo ID {} from database and Azure Blob Storage", id);
             return true;
         } catch (Exception ex) {
             logger.error("Error deleting photo with ID {} from database", id, ex);
@@ -206,5 +231,18 @@ public class PhotoServiceImpl implements PhotoService {
     public Optional<Photo> getNextPhoto(Photo currentPhoto) {
         List<Photo> newerPhotos = photoRepository.findPhotosUploadedAfter(currentPhoto.getUploadedAt());
         return newerPhotos.isEmpty() ? Optional.<Photo>empty() : Optional.of(newerPhotos.getFirst());
+    }
+
+    /**
+     * Extracts the blob name (path after container) from a full Azure Blob Storage URL
+     */
+    private String extractBlobName(String blobUrl) {
+        // URL format: https://<account>.blob.core.windows.net/<container>/<blobName>
+        int containerSlash = blobUrl.indexOf('/', blobUrl.indexOf(".blob.core.windows.net/") + ".blob.core.windows.net/".length());
+        if (containerSlash >= 0) {
+            return blobUrl.substring(containerSlash + 1);
+        }
+        // Fallback: everything after the last '/'
+        return blobUrl.substring(blobUrl.lastIndexOf('/') + 1);
     }
 }
