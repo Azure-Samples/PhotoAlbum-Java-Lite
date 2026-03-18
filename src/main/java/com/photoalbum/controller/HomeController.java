@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.web.multipart.MultipartException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,5 +95,14 @@ public class HomeController {
         response.put("failedUploads", failedUploads);
 
         return ResponseEntity.ok(response);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> handleMultipartException(MultipartException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("error", "No files provided");
+        return ResponseEntity.badRequest().body(response);
     }
 }

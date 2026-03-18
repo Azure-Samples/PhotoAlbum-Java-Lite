@@ -234,13 +234,14 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * Extracts the blob name (path after container) from a full Azure Blob Storage URL
+     * Extracts the blob name from a full Azure Blob Storage (or Azurite) URL
+     * by stripping the known container URL prefix.
      */
     private String extractBlobName(String blobUrl) {
-        // URL format: https://<account>.blob.core.windows.net/<container>/<blobName>
-        int containerSlash = blobUrl.indexOf('/', blobUrl.indexOf(".blob.core.windows.net/") + ".blob.core.windows.net/".length());
-        if (containerSlash >= 0) {
-            return blobUrl.substring(containerSlash + 1);
+        String containerUrl = blobContainerClient.getBlobContainerUrl();
+        if (blobUrl.startsWith(containerUrl)) {
+            String remaining = blobUrl.substring(containerUrl.length());
+            return remaining.startsWith("/") ? remaining.substring(1) : remaining;
         }
         // Fallback: everything after the last '/'
         return blobUrl.substring(blobUrl.lastIndexOf('/') + 1);

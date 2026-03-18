@@ -9,7 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for Azure Blob Storage client using Managed Identity (DefaultAzureCredential).
+ * Configuration for Azure Blob Storage client.
+ * Uses a connection string when {@code azure.storage.blob.connection-string} is set (e.g. for
+ * local testing with Azurite), and falls back to Managed Identity (DefaultAzureCredential)
+ * for production deployments.
  */
 @Configuration
 public class BlobStorageConfig {
@@ -20,8 +23,16 @@ public class BlobStorageConfig {
     @Value("${azure.storage.blob.container-name}")
     private String containerName;
 
+    @Value("${azure.storage.blob.connection-string:}")
+    private String connectionString;
+
     @Bean
     public BlobServiceClient blobServiceClient() {
+        if (connectionString != null && !connectionString.isEmpty()) {
+            return new BlobServiceClientBuilder()
+                    .connectionString(connectionString)
+                    .buildClient();
+        }
         String endpoint = String.format("https://%s.blob.core.windows.net", accountName);
         return new BlobServiceClientBuilder()
                 .endpoint(endpoint)
