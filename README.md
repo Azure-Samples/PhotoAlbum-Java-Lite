@@ -211,12 +211,13 @@ Now that you've assessed the application, let's begin the database migration fro
 
 ### Step 3: Deploy to Azure
 
-1. Login to Azure account and select the subscription you want to use for deployment:
 At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure.
 
 #### 3.1 Provision New Infrastructure and Deploy
 
 Follow this section when you don't have any prepared Azure resources and let the Copilot Agent help provision the necessary infrastructure and deploy the application.
+
+1. Login to Azure account and select the subscription you want to use for deployment:
 
     ```bash
     az login
@@ -241,8 +242,15 @@ Follow this section when you don't have any prepared Azure resources and let the
 
 Follow this section if you already have the necessary Azure resources provisioned and just want to deploy the application to those existing resources.
 
+1. Login to Azure account and select the subscription you want to use for deployment:
+
+    ```bash
+    az login
+    az account set --subscription "<your-subscription-id>"
+    ```
+  
 1. Check if you have the necessary Azure resources in a resource group for this project:
-    - Azure Container Apps (with Azure Container Apps Environment and Azure Log Analytics Workspace as dependency)
+    - Azure Container Apps (with Azure Container Apps Environment and Azure Log Analytics Workspace as dependencies)
     - Azure Database for PostgreSQL Flexible Server with a database created
     - Azure Container Registry
     - Azure Key Vault (to securely store database credentials and other secrets)
