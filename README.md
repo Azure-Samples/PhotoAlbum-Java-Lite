@@ -238,6 +238,13 @@ Follow this section when you don't have any prepared Azure resources and let the
 
     ![Deployment progress](doc-media/deployment-progress.png)
 
+1. Clean up new provisioned resources after the workshop. Find the resource group name used for deployment in the `plan.copilotmd`, `progress.copilotmd`, or `summary.copilotmd` file. Navigate to the resource group in the [Azure Portal](https://portal.azure.com/), review the resources, and delete the resource group to clean up all resources created during the deployment. You can also use Azure CLI to list the resources and delete the resource group:
+
+    ```bash
+    az resource list --resource-group <your-resource-group-name>
+    az group delete --name <your-resource-group-name> --yes --no-wait
+    ```
+
 ### 3.2 Deploy to Existing Azure Resources
 
 Follow this section if you already have the necessary Azure resources provisioned and just want to deploy the application to those existing resources.
