@@ -25,8 +25,7 @@ This guide will help you download and install all the prerequisites needed for t
    CLOUD-DRIVE/
    ├── 1-Installers/
    ├── 2-VSCode-Extensions/
-   ├── 3-Repository/
-   └── 4-Documentation/
+   └── 3-Repository/
    ```
 
 ### Step 2: Install Java Development Kit (JDK)

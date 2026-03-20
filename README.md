@@ -52,8 +52,6 @@ Before starting this workshop, ensure you have:
   - Download from [Microsoft OpenJDK](https://learn.microsoft.com/java/openjdk/download)
 - **Maven**: 3.8.0 or higher
   - Download from [Apache Maven](https://maven.apache.org/download.cgi)
-- **Docker Desktop**: Latest version, required only if you want to run this project locally
-  - Download from [Docker](https://docs.docker.com/desktop/)
 - **Git**: For version control
   - Download from [Git](https://git-scm.com/)
 
@@ -79,6 +77,15 @@ Before starting this workshop, ensure you have:
   - [Create a free account](https://azure.microsoft.com/free/) if you don't have one
 - **Azure CLI**: Latest version
   - Download from [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
+  - After installation, login and set your subscription:
+    ```bash
+    az login
+    az account set --subscription "<your-subscription-id>"
+    ```
+  - Install the Container Apps extension:
+    ```bash
+    az extension add --name containerapp
+    ```
 
 ### Configuration
 
@@ -97,6 +104,9 @@ Before starting this workshop, ensure you have:
 ## Running Locally (Optional, Pre-Migration)
 
 This section is optional. Before starting the migration, you can run the original Oracle-based application locally to understand how it works.
+
+**Required**: **Docker Desktop** (Latest version)
+  - Download from [Docker](https://docs.docker.com/desktop/)
 
 1. **Clone the repository** (if not already done):
    ```bash
@@ -185,7 +195,7 @@ Before running the migration task in Copilot Chat, make sure the chat is configu
 
 1. Open Copilot Chat in **Agent** mode.
 1. Select the custom agent **modernize-azure-java** from the agent picker.
-1. Select the a model from the model picker, e.g., **GPT-5.4**.
+1. Select the a model from the model picker, e.g., **GPT-5.3-Codex**.
 
     ![Custom Agent](doc-media/custom-agent.png)
 
@@ -199,7 +209,7 @@ Now that you've assessed the application, let's begin the database migration fro
     ![Run Task Prompt](doc-media/run-task-prompt.png)
 
 1. The Copilot Agent will analyze the project, generate and open **plan.md** and **progress.md**, then automatically proceed with the migration process.
-1. The agent checks the version control system status and checks out a new branch for migration, then performs the code changes. Click **Allow** for any tool call requests from the agent.
+1. The agent checks the version control system status and checks out a new branch for migration, then performs the code changes. When prompted to confirm an action, click **Allow** for tool call requests. **Tip**: To minimize disruption, open the dropdown menu and select **Allow all commands in this session**.
 1. When the code migration is complete, the agent will automatically run a **validation and fix iteration loop** which includes:
    - **CVE Validation**: Detects Common Vulnerabilities and Exposures in current dependencies and fixes them.
    - **Build Validation**: Attempts to resolve any build errors.
@@ -220,21 +230,23 @@ At this point, you have successfully migrated the database to PostgreSQL. Now, y
 
 Follow this section when you don't have any prepared Azure resources and let the Copilot Agent help provision the necessary infrastructure and deploy the application.
 
-1. Login to Azure account and select the subscription you want to use for deployment:
+1. Switch to the default agent for deployment:
+   - Open Copilot Chat
+   - Select the **agent** from the agent picker (not `modernize-azure-java`)
+   - Be sure to enable the "GitHub Copilot app modernization Deploy" in the tool picker
 
-    ```bash
-    az login
-    az account set --subscription "<your-subscription-id>"
-    ```
 1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Provision Infrastructure and Deploy to Azure**.
 
     ![Run Deployment task](doc-media/deployment-run-task.png)
+
 1. The Copilot Chat panel opens in Agent Mode and will be populated with a predefined prompt.
 
     ![Deployment Prompt](doc-media/deployment-task-prompt.png)
+
 1. Select `Azure Container Apps` in pop-up question box. Provide information as requested. Click **Continue**/**Allow** in pop-up notifications to let Copilot Agent analyze the project and create a deployment plan in **plan.copilotmd** with Azure resources architecture, recommended Azure resources for project and security configurations, and execution steps for deployment.
 
     ![Deployment questions](doc-media/deployment-target-question.png)
+
 1. View the architecture diagram, resource configurations, and execution steps in the plan. Copilot will automatically execute the deployment steps.
 
 1. When prompted, click **Continue**/**Allow** in chat notifications as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**.
@@ -252,13 +264,11 @@ Follow this section when you don't have any prepared Azure resources and let the
 
 Follow this section if you already have the necessary Azure resources provisioned and just want to deploy the application to those existing resources.
 
-1. Login to Azure account and select the subscription you want to use for deployment:
+1. Switch to the default agent for deployment:
+   - Open Copilot Chat
+   - Select the **agent** from the agent picker (not `modernize-azure-java`)
+   - Be sure to enable the "GitHub Copilot app modernization Deploy" in the tool picker
 
-    ```bash
-    az login
-    az account set --subscription "<your-subscription-id>"
-    ```
-  
 1. Check if you have the necessary Azure resources in a resource group for this project. Refer to [azure-setup.ps1](https://github.com/Azure-Samples/PhotoAlbum-Java-Lite/blob/provision-resources/azure-setup.ps1) to set up the required resources, which include:
     - Azure Container Apps (with Azure Container Apps Environment and Azure Log Analytics Workspace as dependencies)
     - Azure Database for PostgreSQL Flexible Server with a database created
@@ -269,12 +279,15 @@ Follow this section if you already have the necessary Azure resources provisione
 1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Deploy to Existing Azure Infrastructure**.
 
     ![Run Deployment to existing task](doc-media/deploy-to-existing-task.png)
+
 1. The Copilot Chat panel opens in Agent Mode and will be populated with a predefined prompt. Provide the necessary information such as Azure subscription, resource group name in pop-up notifications or use direct prompt, e.g. `The resource group name is <resource-group-name>`. Click **Continue**/**Allow** to let Copilot Agent take some time to analyze the project and validate the existing infrastructure.
 
     ![Deployment to existing prompt](doc-media/deploy-to-existing-prompt.png)
+
 1. Copilot will then create a deployment plan in **plan.copilotmd** with execution steps for deployment. Copilot will automatically start to execute the deployment steps. Click **Continue**/**Allow** to let Copilot Agent proceed. Check the deployment progress in **progress.copilotmd**.
 
     ![Deployment to existing execution](doc-media/deploy-to-existing-execution-steps.png)
+
 1. Ask Copilot Agent to visit the application URL with a prompt e.g. `Visit the application URL and check if the application is running fine after deployment`.
 
     ![Visit application prompt](doc-media/deployment-success.png)
