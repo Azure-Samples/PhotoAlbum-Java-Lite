@@ -408,4 +408,3 @@ Write-Host "  az containerapp logs show --name $ContainerAppName --resource-grou
 Write-Host "================================================================"
 
 Write-WarningMessage "Please save these credentials securely!"
-Write-WarningMessage "Consider using Azure Key Vault for production deployments."
