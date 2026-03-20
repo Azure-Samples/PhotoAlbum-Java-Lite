@@ -211,7 +211,10 @@ Now that you've assessed the application, let's begin the database migration fro
 
 ### Step 3: Deploy to Azure
 
-At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure.
+At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure. You can choose one of the two options:
+
+* Provision New Infrastructure and Deploy
+* Deploy to Existing Azure Resources
 
 #### 3.1 Provision New Infrastructure and Deploy
 
