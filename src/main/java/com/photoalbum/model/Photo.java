@@ -34,11 +34,11 @@ public class Photo {
     private String originalFileName;
 
     /**
-     * URL to the photo stored in Azure Blob Storage
+     * Binary photo data stored directly in database
      */
-    @Size(max = 2048)
-    @Column(name = "blob_url", nullable = true, length = 2048)
-    private String blobUrl;
+    @Lob
+    @Column(name = "photo_data", nullable = true)
+    private byte[] photoData;
 
     /**
      * File size in bytes
@@ -82,10 +82,10 @@ public class Photo {
     }
 
     // Constructor with required fields
-    public Photo(String originalFileName, String blobUrl, Long fileSize, String mimeType) {
+    public Photo(String originalFileName, byte[] photoData, Long fileSize, String mimeType) {
         this();
         this.originalFileName = originalFileName;
-        this.blobUrl = blobUrl;
+        this.photoData = photoData;
         this.fileSize = fileSize;
         this.mimeType = mimeType;
     }
@@ -108,12 +108,12 @@ public class Photo {
         this.originalFileName = originalFileName;
     }
 
-    public String getBlobUrl() {
-        return blobUrl;
+    public byte[] getPhotoData() {
+        return photoData;
     }
 
-    public void setBlobUrl(String blobUrl) {
-        this.blobUrl = blobUrl;
+    public void setPhotoData(byte[] photoData) {
+        this.photoData = photoData;
     }
 
     public Long getFileSize() {

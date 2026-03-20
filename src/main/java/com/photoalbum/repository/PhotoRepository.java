@@ -17,40 +17,47 @@ public interface PhotoRepository extends JpaRepository<Photo, String> {
 
     /**
      * Find all photos ordered by upload date (newest first)
+     * Uses Oracle-specific NVL function for handling null mime types
      * @return List of photos ordered by upload date descending
      */
-    @Query(value = "SELECT id, original_file_name, blob_url, file_size, " +
-                   "mime_type, uploaded_at, width, height " +
+    @Query(value = "SELECT id, original_file_name, photo_data, file_size, " +
+                   "NVL(mime_type, 'application/octet-stream') as mime_type, " +
+                   "uploaded_at, width, height " +
                    "FROM photos " +
-                   "ORDER BY uploaded_at DESC", 
+                   "ORDER BY uploaded_at DESC",
            nativeQuery = true)
     List<Photo> findAllOrderByUploadedAtDesc();
 
     /**
      * Find photos uploaded before a specific photo (for navigation)
+     * Uses Oracle-specific ROWNUM for pagination
      * @param uploadedAt The upload timestamp to compare against
      * @return List of photos uploaded before the given timestamp
      */
     @Query(value = "SELECT * FROM (" +
-                   "SELECT id, original_file_name, blob_url, file_size, " +
-                   "mime_type, uploaded_at, width, height, ROWNUM as rn " +
+                   "SELECT id, original_file_name, photo_data, file_size, " +
+                   "NVL(mime_type, 'application/octet-stream') as mime_type, " +
+                   "uploaded_at, width, height, ROWNUM as rn " +
                    "FROM photos " +
                    "WHERE uploaded_at < :uploadedAt " +
                    "ORDER BY uploaded_at DESC" +
-                   ") WHERE ROWNUM <= 10", 
+                   ") WHERE ROWNUM <= 10",
            nativeQuery = true)
     List<Photo> findPhotosUploadedBefore(@Param("uploadedAt") LocalDateTime uploadedAt);
 
     /**
      * Find photos uploaded after a specific photo (for navigation)
+     * Uses Oracle's SYSDATE from DUAL for date comparison
      * @param uploadedAt The upload timestamp to compare against
      * @return List of photos uploaded after the given timestamp
      */
-    @Query(value = "SELECT id, original_file_name, blob_url, file_size, " +
-                   "mime_type, uploaded_at, width, height " +
-                   "FROM photos " +
-                   "WHERE uploaded_at > :uploadedAt " +
-                   "ORDER BY uploaded_at ASC", 
+    @Query(value = "SELECT p.id, p.original_file_name, p.photo_data, p.file_size, " +
+                   "NVL(p.mime_type, 'application/octet-stream') as mime_type, " +
+                   "p.uploaded_at, p.width, p.height " +
+                   "FROM photos p, (SELECT SYSDATE as current_date FROM DUAL) d " +
+                   "WHERE p.uploaded_at > :uploadedAt " +
+                   "AND p.uploaded_at <= d.current_date " +
+                   "ORDER BY p.uploaded_at ASC",
            nativeQuery = true)
     List<Photo> findPhotosUploadedAfter(@Param("uploadedAt") LocalDateTime uploadedAt);
 }
