@@ -211,6 +211,15 @@ Now that you've assessed the application, let's begin the database migration fro
 
 ### Step 3: Deploy to Azure
 
+At this point, you have successfully migrated the database to PostgreSQL. Now, you can deploy the application to Azure. You can choose one of the two options:
+
+* Provision New Infrastructure and Deploy
+* Deploy to Existing Azure Resources
+
+#### 3.1 Provision New Infrastructure and Deploy
+
+Follow this section when you don't have any prepared Azure resources and let the Copilot Agent help provision the necessary infrastructure and deploy the application.
+
 1. Login to Azure account and select the subscription you want to use for deployment:
 
     ```bash
@@ -231,4 +240,42 @@ Now that you've assessed the application, let's begin the database migration fro
 1. When prompted, click **Continue**/**Allow** in chat notifications as Copilot Agent follows the plan and leverages agent tools to create and run provisioning and deployment scripts, fix potential errors, and finish the deployment. You can also check the deployment status in **progress.copilotmd**.
 
     ![Deployment progress](doc-media/deployment-progress.png)
+
+1. Clean up new provisioned resources after the workshop. Find the resource group name used for deployment in the `plan.copilotmd`, `progress.copilotmd`, or `summary.copilotmd` file. Navigate to the resource group in the [Azure Portal](https://portal.azure.com/), review the resources, and delete the resource group to clean up all resources created during the deployment. You can also use Azure CLI to list the resources and delete the resource group:
+
+    ```bash
+    az resource list --resource-group <your-resource-group-name>
+    az group delete --name <your-resource-group-name> --yes --no-wait
+    ```
+
+### 3.2 Deploy to Existing Azure Resources
+
+Follow this section if you already have the necessary Azure resources provisioned and just want to deploy the application to those existing resources.
+
+1. Login to Azure account and select the subscription you want to use for deployment:
+
+    ```bash
+    az login
+    az account set --subscription "<your-subscription-id>"
+    ```
+  
+1. Check if you have the necessary Azure resources in a resource group for this project. Refer to [azure-setup.ps1](https://github.com/Azure-Samples/PhotoAlbum-Java-Lite/blob/provision-resources/azure-setup.ps1) to set up the required resources, which include:
+    - Azure Container Apps (with Azure Container Apps Environment and Azure Log Analytics Workspace as dependencies)
+    - Azure Database for PostgreSQL Flexible Server with a database created
+    - Azure Container Registry
+    - Azure Key Vault (to securely store database credentials and other secrets)
+    - Azure User-assigned Managed Identity (for secure access to ACR and Key Vault)
+
+1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Deploy to Existing Azure Infrastructure**.
+
+    ![Run Deployment to existing task](doc-media/deploy-to-existing-task.png)
+1. The Copilot Chat panel opens in Agent Mode and will be populated with a predefined prompt. Provide the necessary information such as Azure subscription, resource group name in pop-up notifications or use direct prompt, e.g. `The resource group name is <resource-group-name>`. Click **Continue**/**Allow** to let Copilot Agent take some time to analyze the project and validate the existing infrastructure.
+
+    ![Deployment to existing prompt](doc-media/deploy-to-existing-prompt.png)
+1. Copilot will then create a deployment plan in **plan.copilotmd** with execution steps for deployment. Copilot will automatically start to execute the deployment steps. Click **Continue**/**Allow** to let Copilot Agent proceed. Check the deployment progress in **progress.copilotmd**.
+
+    ![Deployment to existing execution](doc-media/deploy-to-existing-execution-steps.png)
+1. Ask Copilot Agent to visit the application URL with a prompt e.g. `Visit the application URL and check if the application is running fine after deployment`.
+
+    ![Visit application prompt](doc-media/deployment-success.png)
 
