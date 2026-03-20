@@ -265,3 +265,7 @@ Follow this section if you already have the necessary Azure resources provisione
 1. Copilot will then create a deployment plan in **plan.copilotmd** with execution steps for deployment. Copilot will automatically start to execute the deployment steps. Click **Continue**/**Allow** to let Copilot Agent proceed. Check the deployment progress in **progress.copilotmd**.
 
     ![Deployment to existing execution](doc-media/deploy-to-existing-execution-steps.png)
+1. Ask Copilot Agent to visit the application URL with a prompt e.g. `Visit the application URL and check if the application is running fine after deployment`.
+
+    ![Visit application prompt](doc-media/deployment-success.png)
+
