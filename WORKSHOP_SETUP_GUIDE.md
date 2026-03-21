@@ -53,12 +53,12 @@ This guide will help you download and install all the prerequisites needed for t
 ### Step 3: Install Apache Maven
 
 1. Navigate to `1-Installers/Maven/`
-2. Download `apache-maven-3.9.9-bin.zip`
+2. Download `apache-maven-3.9.*-bin.zip`
 3. Extract the ZIP file to `C:\Program Files\Apache\`
 4. **Add Maven to PATH**:
    - Open System Properties → Environment Variables
    - Under System Variables, find `Path` and click Edit
-   - Click New and add: `C:\Program Files\Apache\apache-maven-3.9.9\bin`
+   - Click New and add: `C:\Program Files\Apache\apache-maven-3.9.*\bin` (replace `*` with the actual patch version)
    - Click OK on all dialogs
 5. **Verify installation** (open a new PowerShell window):
    ```powershell
@@ -137,13 +137,14 @@ This guide will help you download and install all the prerequisites needed for t
 
 1. Navigate to `1-Installers/AppCAT/`
 2. Download `azure-migrate-appcat-for-java-cli-windows-amd64-x.x.x.x.zip`
-3. Extract the ZIP file to `C:\Users\<YourUsername>\.appcat\`
+3. Extract the ZIP file to `C:\Users\<YourUsername>\` and rename the content root folder to `.appcat`.
    - Replace `<YourUsername>` with your actual Windows username
    - Create the `.appcat` folder if it doesn't exist
+   - **When this is set properly, you can see `appcat.exe` under `C:\Users\<YourUsername>\.appcat`**.
 4. **Add AppCAT to PATH**:
    - Open System Properties → Environment Variables
    - Under System Variables, find `Path` and click Edit
-   - Click New and add: `C:\Users\<YourUsername>\.appcat`
+   - Click New and add: `%USERPROFILE%\.appcat`
    - Click OK on all dialogs
 5. **Verify installation** (open a new PowerShell window):
    ```powershell
@@ -154,7 +155,6 @@ This guide will help you download and install all the prerequisites needed for t
 
 1. Navigate to `2-VSCode-Extensions/`
 2. Download all four `.vsix` files:
-   - `GitHub.copilot-x.x.x.vsix`
    - `GitHub.copilot-chat-x.x.x.vsix`
    - `vscjava.migrate-java-to-azure-x.x.x.vsix`
    - `ms-azuretools.vscode-bicep-x.x.x.vsix`

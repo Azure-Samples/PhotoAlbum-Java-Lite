@@ -1,6 +1,6 @@
 # Photo Album Application - Migration Workshop
 
-This document serves as a comprehensive workshop guide that will walk you through the process of migrating a Java application to Azure using GitHub Copilot app modernization. The workshop covers assessment, database migration from Oracle to PostgreSQL, and deployment to Azure.
+This document serves as a comprehensive workshop guide that will walk you through the process of migrating a Java application to Azure using GitHub Copilot modernization. The workshop covers assessment, database migration from Oracle to PostgreSQL, and deployment to Azure.
 
 **What the Migration Process Will Do:**
 The migration will transform your application from using Oracle Database to a modern Azure-native solution. This includes migrating from Oracle Database to Azure Database for PostgreSQL Flexible Server with managed identity authentication, and deploying it to Azure with proper monitoring and health checks.
@@ -65,7 +65,7 @@ Before starting this workshop, ensure you have:
   1. **GitHub Copilot** extension
      - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
      - Sign in to your GitHub account within VS Code
-  2. **GitHub Copilot app modernization** extension
+  2. **GitHub Copilot modernization** extension
      - Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vscjava.migrate-java-to-azure)
      - Restart VS Code after installation
   3. **Bicep** extension
@@ -84,7 +84,7 @@ Before starting this workshop, ensure you have:
     ```
   - Install the Container Apps extension:
     ```bash
-    az extension add --name containerapp
+    az extension add --allow-preview --upgrade --yes --name containerapp
     ```
 
 ### Configuration
@@ -95,8 +95,8 @@ Before starting this workshop, ensure you have:
 - Git-managed Java project using Maven
 - Ensure the following tools are selected:
   - Built-in
-  - GitHub Copilot app modernization Deploy
-  - GitHub Copilot app modernization
+  - GitHub Copilot modernization Deploy
+  - GitHub Copilot modernization
   - GitHub Copilot modernization - upgrade for Java
 
   ![Tools Selection](doc-media/tool-selection.png)
@@ -156,17 +156,25 @@ cd PhotoAlbum-Java-Lite
 code .
 ```
 
-#### 1.2 Install GitHub Copilot App Modernization Extension
+#### 1.2 Install GitHub Copilot modernization Extension
 
-In VS Code, open the Extensions view from the Activity Bar, search for the `GitHub Copilot app modernization` extension in the marketplace. Click the Install button for the extension. After installation completes, you should see a notification in the bottom-right corner of VS Code confirming success.
+In VS Code, open the Extensions view from the Activity Bar, search for the `GitHub Copilot modernization` extension in the marketplace. Click the Install button for the extension. After installation completes, you should see a notification in the bottom-right corner of VS Code confirming success.
+
+To use the extension, you need to ensure you are logged in to GitHub Copilot. Follow the steps:
+1. Click the "Toggle Chat" button on the center right of the VS Code title bar. Follow the instructions to sign in GitHub Copilot.
+1. Click the "GitHub Copilot modernization" icon on the VS Code left tools panel. It will ask you to sign in a GitHub Copilot account. Choose the one used in the previous step.
+
+> [!NOTE]
+> At the bottom of the GitHub Copilot Chat panel, toggle the **Pick Model** dropdown, and pick **GPT-5.3-Codex**. It will be used in the following workshop steps.
 
 #### 1.3 Run Assessment
 
-1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane.
-1. In the **QUICKSTART** section, click **Start Assessment** to trigger the app assessment.
+1. In the Activity sidebar, open the **GitHub Copilot modernization** extension pane.
+1. In the **QUICKSTART** section, click **Start Assessment**.
 
     ![Trigger Assessment](doc-media/trigger-assessment.png)
 
+1. Choose **Recommended Assessment**, tick **Java Upgrade** and **Cloud Readiness** and then click **OK** to trigger the app assessment.
 1. Wait for the assessment to be completed. This step could take several minutes.
 1. Upon completion, an **Assessment Report** tab opens. This report provides a categorized view of cloud readiness issues and recommended solutions. Select the **Issues** tab to view proposed solutions and proceed with migration steps.
 
@@ -191,13 +199,8 @@ Look for the following in your report:
 
 ### Step 2: Migrate from Oracle to PostgreSQL
 
-Before running the migration task in Copilot Chat, make sure the chat is configured to use your preferred LLM model, to choose the model:
-
-1. Open Copilot Chat in **Agent** mode.
-1. Select the custom agent **modernize-azure-java** from the agent picker.
-1. Select the a model from the model picker, e.g., **GPT-5.3-Codex**.
-
-    ![Custom Agent](doc-media/custom-agent.png)
+> [!NOTE]
+> Before running the steps, confirm that **GPT-5.3-Codex** is selected at the bottom of the GitHub Copilot Chat panel.
 
 Now that you've assessed the application, let's begin the database migration from Oracle to Azure Database for PostgreSQL.
 
@@ -232,10 +235,10 @@ Follow this section when you don't have any prepared Azure resources and let the
 
 1. Switch to the default agent for deployment:
    - Open Copilot Chat
-   - Select the **agent** from the agent picker (not `modernize-azure-java`)
-   - Be sure to enable the "GitHub Copilot app modernization Deploy" in the tool picker
+   - Select the **Agent** (first option) from the agent picker (not `modernize-azure-java`)
+   - Be sure to enable the "GitHub Copilot modernization Deploy" in the tool picker (next to the model picker).
 
-1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Provision Infrastructure and Deploy to Azure**.
+1. In the Activity sidebar, open the **GitHub Copilot modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Provision Infrastructure and Deploy to Azure**.
 
     ![Run Deployment task](doc-media/deployment-run-task.png)
 
@@ -266,8 +269,8 @@ Follow this section if you already have the necessary Azure resources provisione
 
 1. Switch to the default agent for deployment:
    - Open Copilot Chat
-   - Select the **agent** from the agent picker (not `modernize-azure-java`)
-   - Be sure to enable the "GitHub Copilot app modernization Deploy" in the tool picker
+   - Select the **Agent** from the agent picker (the first option in the list, not `modernize-azure-java`)
+   - Be sure to enable the "GitHub Copilot modernization Deploy" in the tool picker
 
 1. Check if you have the necessary Azure resources in a resource group for this project. Refer to [azure-setup.ps1](https://github.com/Azure-Samples/PhotoAlbum-Java-Lite/blob/provision-resources/azure-setup.ps1) to set up the required resources, which include:
     - Azure Container Apps (with Azure Container Apps Environment and Azure Log Analytics Workspace as dependencies)
@@ -276,7 +279,23 @@ Follow this section if you already have the necessary Azure resources provisione
     - Azure Key Vault (to securely store database credentials and other secrets)
     - Azure User-assigned Managed Identity (for secure access to ACR and Key Vault)
 
-1. In the Activity sidebar, open the **GitHub Copilot app modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Deploy to Existing Azure Infrastructure**.
+    > [!NOTE]
+    > GitHub Copilot in VS Code allows you to pass a file as the additional context. To tell the below deploy task, you can write your resource information in an opened editor, and then in the Copilot Chat box, click the `+ your-file-name` at the top of the input textarea. This will save you some time later as you don't need to pass those value interactively.
+    > Here's a sample context file that describes the existing resources:
+    >
+    > ```plain
+    > Server FQDN: xxxx.postgres.database.azure.com
+    > Database: xxxx
+    > Application User: xxxx
+    > Resource Group: xxxx
+    > Key Vault Name: xxxx
+    > Managed Identity Client ID: xxxx
+    > Container App URL: https://xxxx.someregion.azurecontainerapps.io
+    >
+    > The container app is configured to read DB secrets from Key Vault.
+    > ```
+
+1. In the Activity sidebar, open the **GitHub Copilot modernization** extension pane. In the **TASKS** section, expand **Common Tasks** > **Deployment Tasks**. Click the run button for **Deploy to Existing Azure Infrastructure**.
 
     ![Run Deployment to existing task](doc-media/deploy-to-existing-task.png)
 
@@ -291,4 +310,3 @@ Follow this section if you already have the necessary Azure resources provisione
 1. Ask Copilot Agent to visit the application URL with a prompt e.g. `Visit the application URL and check if the application is running fine after deployment`.
 
     ![Visit application prompt](doc-media/deployment-success.png)
-

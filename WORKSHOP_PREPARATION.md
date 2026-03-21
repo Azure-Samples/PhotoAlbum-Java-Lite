@@ -34,7 +34,7 @@ CLOUD-DRIVE/
 
 ### **Apache Maven**
 - **Download**: https://maven.apache.org/download.cgi
-- **File**: `apache-maven-3.9.9-bin.zip`
+- **File**: `apache-maven-3.9.x-bin.zip`
 - **Size**: ~10 MB
 - **Storage**: `1-Installers/Maven/`
 
@@ -51,7 +51,7 @@ CLOUD-DRIVE/
 - **Storage**: `1-Installers/VSCode/`
 
 ### **Azure CLI**
-- **Download**: https://docs.microsoft.com/cli/azure/install-azure-cli
+- **Download**: https://aka.ms/installazurecliwindowsx64
 - **File**: `azure-cli-2.xx.x.msi`
 - **Size**: ~100 MB
 - **Storage**: `1-Installers/AzureCLI/`
@@ -59,7 +59,7 @@ CLOUD-DRIVE/
 ### **Azure CLI Container Apps Extension**
 - **How to collect**:
   1. Install Azure CLI on your machine
-  2. Run: `az extension add --name containerapp`
+  2. Run: `az extension add --allow-preview --upgrade --yes --name containerapp`
   3. Locate the `.whl` file at: `C:\Users\<YourUsername>\.azure\cliextensions\containerapp\`
   4. Copy `containerapp-<version>-py3-none-any.whl` to cloud storage
 
@@ -70,7 +70,7 @@ CLOUD-DRIVE/
 - **Storage**: `1-Installers/AzureCLI/extensions/`
 
 ### **AppCAT CLI**
-- **Download**: https://learn.microsoft.com/azure/migrate/appcat/appcat-7-quickstart?view=migrate&tabs=windows#download-and-install
+- **Download**: https://aka.ms/appcat-install
 - **File**: `azure-migrate-appcat-for-java-cli-windows-amd64-x.x.x.x.zip`
 - **Size**: ~50-100 MB
 - **Storage**: `1-Installers/AppCAT/`
@@ -79,24 +79,21 @@ CLOUD-DRIVE/
 
 ## 2️⃣ Visual Studio Code Extensions
 
-**How to download .vsix files**: On each extension's marketplace page, click "Download Extension" link on the right sidebar, or click the "..." menu and select "Download Extension".
+**How to download .vsix files**:
+* Try Option 1: On each extension's marketplace page, click "Download Extension" link on the right sidebar, or click the "..." menu and select "Download Extension".
+* Try Option 2: In VS Code, open the extensions panel, search for the extension, right click on the extension in the list, and click "Download VSIX".
 
-1. **GitHub Copilot**
-   - **Download**: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot
-   - **File**: `GitHub.copilot-x.x.x.vsix`
-   - **Size**: ~5 MB
-
-2. **GitHub Copilot Chat**
+1. **GitHub Copilot Chat**
    - **Download**: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat
    - **File**: `GitHub.copilot-chat-x.x.x.vsix`
    - **Size**: ~2 MB
 
-3. **GitHub Copilot App Modernization**
+2. **GitHub Copilot modernization**
    - **Download**: https://marketplace.visualstudio.com/items?itemName=vscjava.migrate-java-to-azure
    - **File**: `vscjava.migrate-java-to-azure-x.x.x.vsix`
    - **Size**: ~10 MB
 
-4. **Bicep**
+3. **Bicep**
    - **Download**: https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep
    - **File**: `ms-azuretools.vscode-bicep-x.x.x.vsix`
    - **Size**: ~5 MB
@@ -110,7 +107,7 @@ CLOUD-DRIVE/
 ### **PhotoAlbum-Java-Lite**
 - **Repository**: https://github.com/Azure-Samples/PhotoAlbum-Java-Lite
 - **Clone command**: `git clone https://github.com/Azure-Samples/PhotoAlbum-Java-Lite.git`
-- **Alternative**: Download ZIP from GitHub
+- **Alternative**: Download ZIP from GitHub by clicking the green "&lt;&gt; Code" button and then "Download ZIP".
 - **Size**: ~5-10 MB
 - **Storage**: `3-Repository/PhotoAlbum-Java-Lite/`
 
@@ -149,6 +146,14 @@ az provider register --namespace Microsoft.Insights
 az provider register --namespace Microsoft.Network
 az provider register --namespace Microsoft.Resources
 az provider register --namespace Microsoft.KeyVault
+```
+
+It takes some time to get a resource provider registered in a subscription. Use the following command to check the registration status:
+
+```bash
+# replace the <namespace> part with the namespace you passed in the above register command
+az provider show --namespace <namespace> --query registrationState --output tsv
+#=> Registered
 ```
 
 **Reference**: https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types
