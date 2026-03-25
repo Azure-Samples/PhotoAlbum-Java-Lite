@@ -73,7 +73,7 @@ az postgres flexible-server create `
     --admin-user $PostgresAdminUser `
     --admin-password $PostgresAdminPassword `
     --version "15" `
-    --sku-name "Standard_D2ds_v4" `
+    --sku-name "Standard_B1ms" `
     --storage-size "32" `
     --backup-retention "7" `
     --public-access "0.0.0.0" `
@@ -252,8 +252,8 @@ az containerapp create `
     --ingress external `
     --min-replicas 1 `
     --max-replicas 3 `
-    --cpu 1.0 `
-    --memory 2.0Gi `
+    --cpu 0.25 `
+    --memory 0.5Gi `
     --secrets `
         "pg-connection-url=keyvaultref:$PgUrlSecretId,identityref:$ManagedIdentityId" `
         "pg-admin-user=keyvaultref:$PgUserSecretId,identityref:$ManagedIdentityId" `
