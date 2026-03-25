@@ -1,9 +1,9 @@
 param(
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true)]
     [string]$Suffix,
 
-    [Parameter(Mandatory = $false)]
-    [string]$Location = "Central US"
+    [Parameter(Mandatory = $true)]
+    [string]$Location = "Japan West"
 )
 
 $ErrorActionPreference = "Stop"
@@ -68,8 +68,6 @@ $PostgresServerName = "photoalbum-postgres-$([DateTimeOffset]::UtcNow.ToUnixTime
 $PostgresAdminUser = "photoalbum_admin"
 $PostgresAdminPassword = "P@ssw0rd123!"
 $PostgresDatabaseName = "photoalbum"
-$PostgresAppUser = "photoalbum"
-$PostgresAppPassword = "photoalbum"
 
 Write-Info "Using suffix: $ResourceSuffix"
 Write-Info "Using location: $Location"
@@ -134,19 +132,6 @@ az postgres flexible-server firewall-rule create `
     --end-ip-address "0.0.0.0" `
     --output none
 
-# Add current IP to firewall
-$CurrentIP = (Invoke-RestMethod -Uri "https://api.ipify.org" -Method Get).ToString().Trim()
-if (-not [string]::IsNullOrWhiteSpace($CurrentIP)) {
-    Write-Info "Adding your current IP ($CurrentIP) to firewall..."
-    az postgres flexible-server firewall-rule create `
-        --resource-group $ResourceGroup `
-        --name $PostgresServerName `
-        --rule-name "AllowCurrentIP" `
-        --start-ip-address $CurrentIP `
-        --end-ip-address $CurrentIP `
-        --output none
-}
-
 # Get server FQDN
 Write-Info "Getting server connection details..."
 $ServerFqdn = (az postgres flexible-server show `
@@ -158,71 +143,6 @@ $ServerFqdn = (az postgres flexible-server show `
 if ([string]::IsNullOrWhiteSpace($ServerFqdn)) {
     throw "Could not get PostgreSQL server FQDN from Azure CLI. The server may still be provisioning, or the CLI command failed. Run: az postgres flexible-server show --resource-group $ResourceGroup --name $PostgresServerName --query fullyQualifiedDomainName -o tsv"
 }
-
-# Wait a moment for server to be fully ready
-Write-Info "Waiting for server to be fully ready..."
-Start-Sleep -Seconds 30
-
-# Setup application user and tables
-Write-Info "Setting up database user and tables..."
-
-# Create application user using the more reliable execute command
-Write-Info "Creating application user..."
-try {
-    az postgres flexible-server execute `
-        --name $PostgresServerName `
-        --admin-user $PostgresAdminUser `
-        --admin-password $PostgresAdminPassword `
-        --database-name "postgres" `
-        --querytext "CREATE USER photoalbum WITH PASSWORD 'photoalbum';" | Out-Null
-}
-catch {
-    Write-WarningMessage "User may already exist, continuing..."
-}
-
-# Grant database connection privileges
-Write-Info "Granting database connection privileges..."
-try {
-    az postgres flexible-server execute `
-        --name $PostgresServerName `
-        --admin-user $PostgresAdminUser `
-        --admin-password $PostgresAdminPassword `
-        --database-name "postgres" `
-        --querytext "GRANT CONNECT ON DATABASE photoalbum TO photoalbum;" | Out-Null
-}
-catch {
-    Write-WarningMessage "Grant may have failed, continuing..."
-}
-
-# Grant schema privileges on the photoalbum database
-Write-Info "Granting schema privileges..."
-try {
-    az postgres flexible-server execute `
-        --name $PostgresServerName `
-        --admin-user $PostgresAdminUser `
-        --admin-password $PostgresAdminPassword `
-        --database-name "photoalbum" `
-        --querytext "GRANT ALL PRIVILEGES ON SCHEMA public TO photoalbum;" | Out-Null
-}
-catch {
-    Write-WarningMessage "Schema privileges may have failed, continuing..."
-}
-
-# Grant privileges on future objects (so Hibernate can create and manage tables)
-Write-Info "Setting up future object privileges for Hibernate..."
-try {
-    az postgres flexible-server execute `
-        --name $PostgresServerName `
-        --admin-user $PostgresAdminUser `
-        --admin-password $PostgresAdminPassword `
-        --database-name "photoalbum" `
-        --querytext "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO photoalbum;" | Out-Null
-}
-catch {
-    Write-WarningMessage "Default privileges may have failed, continuing..."
-}
-
-Write-Info "Database user and schema setup completed! Hibernate will create and manage tables."
 
 # Build the connection string. Use ${...} to avoid PowerShell parsing ":" as scoped variable syntax.
 $DatasourceUrl = "jdbc:postgresql://${ServerFqdn}:5432/${PostgresDatabaseName}"
@@ -334,8 +254,8 @@ Start-Sleep -Seconds 30
 # Store DB secrets in Key Vault
 Write-Info "Storing PostgreSQL secrets in Key Vault..."
 az keyvault secret set --vault-name $KeyVaultName --name "pg-connection-url" --value $DatasourceUrl --output none
-az keyvault secret set --vault-name $KeyVaultName --name "pg-admin-user" --value $PostgresAppUser --output none
-az keyvault secret set --vault-name $KeyVaultName --name "pg-admin-password" --value $PostgresAppPassword --output none
+az keyvault secret set --vault-name $KeyVaultName --name "pg-admin-user" --value $PostgresAdminUser --output none
+az keyvault secret set --vault-name $KeyVaultName --name "pg-admin-password" --value $PostgresAdminPassword --output none
 
 $PgUrlSecretId = (az keyvault secret show --vault-name $KeyVaultName --name "pg-connection-url" --query "id" --output tsv).ToString().Trim()
 $PgUserSecretId = (az keyvault secret show --vault-name $KeyVaultName --name "pg-admin-user" --query "id" --output tsv).ToString().Trim()
@@ -395,7 +315,7 @@ Write-Host "Setup Complete!"
 Write-Host "================================================================"
 Write-Host "Server FQDN: $ServerFqdn"
 Write-Host "Database: $PostgresDatabaseName"
-Write-Host "Application User: $PostgresAppUser"
+Write-Host "Database User: $PostgresAdminUser"
 Write-Host "Resource Group: $ResourceGroup"
 Write-Host "Key Vault Name: $KeyVaultName"
 Write-Host "Managed Identity Client ID: $ManagedIdentityClientId"
