@@ -46,6 +46,10 @@ function Ensure-ProviderRegistered {
 
 Write-Info "=== Azure Photo Album Resources Setup ==="
 
+Write-Info "Ensure the required Azure CLI extensions are installed and up to date..."
+az extension add --allow-preview --upgrade --yes --name containerapp
+az extension add --allow-preview --upgrade --yes --name rdbms-connect
+
 # Variables
 $ResourceSuffix = if ([string]::IsNullOrWhiteSpace($Suffix)) {
     [Guid]::NewGuid().ToString("N").Substring(0, 6)
