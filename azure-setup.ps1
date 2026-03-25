@@ -23,31 +23,7 @@ function Write-ErrorMessage {
     Write-Host "[ERROR] $Message" -ForegroundColor Red
 }
 
-function Ensure-ProviderRegistered {
-    param([Parameter(Mandatory = $true)][string]$Namespace)
-
-    $state = (az provider show --namespace $Namespace --query registrationState --output tsv 2>$null).ToString().Trim()
-
-    if ($state -eq "Registered") {
-        Write-Info "Provider already registered: $Namespace"
-        return
-    }
-
-    Write-Info "Registering provider: $Namespace"
-    az provider register --namespace $Namespace --wait --output none
-
-    $finalState = (az provider show --namespace $Namespace --query registrationState --output tsv).ToString().Trim()
-    if ($finalState -ne "Registered") {
-        throw "Failed to register provider namespace '$Namespace'. Current state: $finalState"
-    }
-
-    Write-Info "Provider registered: $Namespace"
-}
-
 Write-Info "=== Azure Photo Album Resources Setup ==="
-
-Write-Info "Ensure the required Azure CLI extensions are installed and up to date..."
-az extension add --allow-preview --upgrade --yes --name containerapp
 az extension add --allow-preview --upgrade --yes --name rdbms-connect
 
 # Variables
@@ -75,19 +51,6 @@ $PostgresDatabaseName = "photoalbum"
 
 Write-Info "Using suffix: $ResourceSuffix"
 Write-Info "Using location: $Location"
-
-# Register required providers for all resources used by this script.
-$RequiredProviders = @(
-    "Microsoft.App",
-    "Microsoft.ContainerRegistry",
-    "Microsoft.DBforPostgreSQL",
-    "Microsoft.KeyVault",
-    "Microsoft.ManagedIdentity"
-)
-
-foreach ($ProviderNamespace in $RequiredProviders) {
-    Ensure-ProviderRegistered -Namespace $ProviderNamespace
-}
 
 Write-Info "Using default subscription..."
 az account show --query "{Name:name, SubscriptionId:id}" -o table
