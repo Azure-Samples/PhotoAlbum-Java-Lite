@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
 function Write-Info {
     param([string]$Message)
@@ -44,7 +45,9 @@ $ManagedIdentityName = "photo-album-id-$ResourceSuffix"
 $KeyVaultName = "photoalbumkv$ResourceSuffix"
 $ContainerAppEnvName = "photo-album-env-$ResourceSuffix"
 $ContainerAppName = "photo-album-app"
-$PostgresServerName = "photoalbum-postgres-$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+$SubscriptionId = (az account show --query id --output tsv 2>$null).ToString().Trim()
+$ShortSubId = $SubscriptionId.Replace("-", "").Substring(0, 8)
+$PostgresServerName = "photoalbum-postgres-$ResourceSuffix-$ShortSubId"
 $PostgresAdminUser = "photoalbum_admin"
 $PostgresAdminPassword = "P@ssw0rd123!"
 $PostgresDatabaseName = "photoalbum"
@@ -73,6 +76,7 @@ az postgres flexible-server create `
     --admin-user $PostgresAdminUser `
     --admin-password $PostgresAdminPassword `
     --version "15" `
+    --tier "Burstable" `
     --sku-name "Standard_B1ms" `
     --storage-size "32" `
     --backup-retention "7" `

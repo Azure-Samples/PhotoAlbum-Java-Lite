@@ -41,7 +41,7 @@ foreach ($ProviderNamespace in $RequiredProviders) {
     Ensure-ProviderRegistered -Namespace $ProviderNamespace
 }
 
-Write-Info "Pre-flight complete. Starting parallel jobs..."
+Write-Info "Pre-flight complete. Starting jobs..."
 
 $Configurations = @(
     @{ Suffix = "001"; Location = "Japan West" },
@@ -56,10 +56,14 @@ $Configurations = @(
     @{ Suffix = "010"; Location = "Japan West" }
 )
 
-Write-Host "Starting $($Configurations.Count) parallel jobs..."
+Write-Host "Starting $($Configurations.Count) jobs..."
 
-$Configurations | ForEach-Object -Parallel {
-    powershell -ExecutionPolicy Bypass -File $using:ScriptPath -Suffix $_.Suffix -Location $_.Location
-} -ThrottleLimit 10
+# $Configurations | ForEach-Object -Parallel {
+#     pwsh -ExecutionPolicy Bypass -File $using:ScriptPath -Suffix $_.Suffix -Location $_.Location
+# } -ThrottleLimit 10
+
+foreach ($Config in $Configurations) {
+    pwsh -ExecutionPolicy Bypass -File $ScriptPath -Suffix $Config.Suffix -Location $Config.Location
+}
 
 Write-Host "`nAll jobs finished."
