@@ -38,14 +38,14 @@ if ($ResourceSuffix -notmatch '^[a-z0-9]{3,12}$') {
     throw "Invalid suffix '$ResourceSuffix'. Use 3-12 lowercase letters or numbers (a-z, 0-9)."
 }
 
+$SubscriptionId = (az account show --query id --output tsv 2>$null).ToString().Trim()
+$ShortSubId = $SubscriptionId.Replace("-", "").Substring(0, 8)
 $ResourceGroup = "photo-album-resources-$ResourceSuffix"
-$AcrName = "photoalbumacr$ResourceSuffix"
+$AcrName = "photoalbumacr$ResourceSuffix$ShortSubId"
 $ManagedIdentityName = "photo-album-id-$ResourceSuffix"
 $KeyVaultName = "photoalbumkv$ResourceSuffix"
 $ContainerAppEnvName = "photo-album-env-$ResourceSuffix"
 $ContainerAppName = "photo-album-app"
-$SubscriptionId = (az account show --query id --output tsv 2>$null).ToString().Trim()
-$ShortSubId = $SubscriptionId.Replace("-", "").Substring(0, 8)
 $PostgresServerName = "photoalbum-postgres-$ResourceSuffix-$ShortSubId"
 $PostgresAdminUser = "photoalbum_admin"
 $PostgresAdminPassword = "P@ssw0rd123!"
