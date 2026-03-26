@@ -35,7 +35,8 @@ $RequiredProviders = @(
     "Microsoft.ContainerRegistry",
     "Microsoft.DBforPostgreSQL",
     "Microsoft.KeyVault",
-    "Microsoft.ManagedIdentity"
+    "Microsoft.ManagedIdentity",
+    "Microsoft.OperationalInsights"
 )
 foreach ($ProviderNamespace in $RequiredProviders) {
     Ensure-ProviderRegistered -Namespace $ProviderNamespace
