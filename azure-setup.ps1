@@ -7,7 +7,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$PSNativeCommandUseErrorActionPreference = $true
 
 function Write-Info {
     param([string]$Message)
