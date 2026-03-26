@@ -251,6 +251,8 @@ az containerapp create `
     --resource-group $ResourceGroup `
     --environment $ContainerAppEnvName `
     --user-assigned $ManagedIdentityId `
+    --registry-server "$AcrName.azurecr.io" `
+    --registry-identity $ManagedIdentityId `
     --image "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest" `
     --target-port 80 `
     --ingress external `
